@@ -1,7 +1,7 @@
 import Ship from './Ship';
 
 const Gameboard = () => {
-  const ships = {
+  const fleet = {
     carrier: Ship(5),
     battleship: Ship(4),
     cruiser: Ship(3),
@@ -9,7 +9,16 @@ const Gameboard = () => {
     destroyer: Ship(2),
   };
 
-  const coordinatesObj = {};
+  const locations = {
+    carrier: [],
+    battleship: [],
+    cruiser: [],
+    submarine: [],
+    destroyer: [],
+  };
+
+  const missedShots = [];
+  let sunkenShips = 0;
 
   const isValidCoordinates = (coordinates) => {
     const firstVal = coordinates.charCodeAt() - 96;
@@ -82,21 +91,78 @@ const Gameboard = () => {
     return completeCoordinates(random);
   };
 
+  // Checks for location overlaps
+  const isValidLocation = (location) => {
+    const occupied = [
+      ...locations.carrier,
+      ...locations.battleship,
+      ...locations.cruiser,
+      ...locations.submarine,
+      ...locations.destroyer,
+    ];
+
+    const matched = location.filter((item) => occupied.includes(item));
+    return matched.length === 0;
+  };
+
   const assignRandomCoordinates = () => {
-    Object.keys(ships).forEach((ship) => {
-      coordinatesObj[ship] = randomizeLocation(ships[ship]);
+    Object.keys(fleet).forEach((ship) => {
+      while (locations[ship].length === 0) {
+        const location = randomizeLocation(fleet[ship]);
+        if (isValidLocation(location)) locations[ship] = location;
+      }
     });
   };
 
-  assignRandomCoordinates();
+  const placeShip = ({ ship, location }) => {
+    locations[ship] = location;
+  };
 
-  const getCoordinatesObj = () => coordinatesObj;
+  const getLocations = () => locations;
 
-  // const receiveAttack = (coordinates) => {};
+  const findShip = (coordinates) => {
+    let ship = null;
+
+    Object.keys(locations).forEach((item) => {
+      if (locations[item].includes(coordinates)) ship = item;
+    });
+
+    return ship;
+  };
+
+  const removeCoordinates = (coordinates) => {
+    Object.keys(locations).forEach((ship) => {
+      locations[ship] = locations[ship].filter((item) => item !== coordinates);
+    });
+  };
+
+  const recordAttack = ({ ship, coordinates }) => {
+    if (ship !== null) {
+      removeCoordinates(coordinates);
+      if (fleet[ship].isSunk()) sunkenShips += 1;
+    } else {
+      missedShots.push(coordinates);
+    }
+  };
+
+  const hitShip = (ship) => fleet[ship].hit();
+
+  const receiveAttack = (coordinates, cb = hitShip) => {
+    const ship = findShip(coordinates);
+    if (ship !== null) cb(ship);
+    recordAttack({ ship, coordinates });
+    return ship;
+  };
+
+  const isFleetDestroyed = () => Object.keys(fleet).length === sunkenShips;
 
   return {
-    randomizeLocation,
-    getCoordinatesObj,
+    assignRandomCoordinates,
+    getLocations,
+    isValidLocation,
+    placeShip,
+    receiveAttack,
+    isFleetDestroyed,
   };
 };
 
