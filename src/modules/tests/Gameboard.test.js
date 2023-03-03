@@ -3,8 +3,6 @@ import Gameboard from '../Gameboard';
 
 describe('receiveAttack should send hit() when a ship is hit', () => {
   const player = Gameboard();
-  player.assignRandomCoordinates();
-
   const hit = jest.fn();
   const hitOrMiss = player.receiveAttack('e5', hit);
 
@@ -17,20 +15,36 @@ describe('receiveAttack should send hit() when a ship is hit', () => {
   });
 });
 
-describe('isFleetDestroyed returns true when all ships have been sunk', () => {
+describe('isFleetDestroyed checks if all ships have been sunk', () => {
   const player = Gameboard();
-  player.assignRandomCoordinates();
-
   const locations = [].concat(...Object.values(player.getLocations()));
 
-  test('Returns false by default', () => {
+  test('Return false by default', () => {
     expect(player.isFleetDestroyed()).toBe(false);
   });
 
-  test('Returns true after sinking all the ships', () => {
+  test('Return true after sinking all the ships', () => {
     // This sinks all the ships
     locations.forEach((coord) => player.receiveAttack(coord));
 
     expect(player.isFleetDestroyed()).toBe(true);
+  });
+});
+
+describe('isValidLocation checks for location overlaps', () => {
+  // A location is an array of coordinates
+  const player = Gameboard();
+  const locations = [].concat(...Object.values(player.getLocations()));
+  const testArgs = ['a1', 'b2', 'c3', 'd4', 'e5', 'c6'].filter((coord) => {
+    if (locations.includes(coord)) return;
+    return coord;
+  });
+
+  test('Return false if location given overlaps with existing location', () => {
+    expect(player.isValidLocation([locations[0]])).toBe(false);
+  });
+
+  test('Return true if location given has no overlap', () => {
+    expect(player.isValidLocation(testArgs)).toBe(true);
   });
 });
