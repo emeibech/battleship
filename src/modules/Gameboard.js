@@ -9,14 +9,7 @@ const Gameboard = () => {
     destroyer: Ship(2),
   };
 
-  const locations = {
-    carrier: [],
-    battleship: [],
-    cruiser: [],
-    submarine: [],
-    destroyer: [],
-  };
-
+  const locations = {};
   const missedShots = [];
   let sunkenShips = 0;
 
@@ -93,13 +86,7 @@ const Gameboard = () => {
 
   // Checks for location overlaps
   const isValidLocation = (location) => {
-    const occupied = [
-      ...locations.carrier,
-      ...locations.battleship,
-      ...locations.cruiser,
-      ...locations.submarine,
-      ...locations.destroyer,
-    ];
+    const occupied = [].concat(...Object.values(locations));
 
     const matched = location.filter((item) => occupied.includes(item));
     return matched.length === 0;
@@ -107,7 +94,7 @@ const Gameboard = () => {
 
   const assignRandomCoordinates = () => {
     Object.keys(fleet).forEach((ship) => {
-      while (locations[ship].length === 0) {
+      while (locations[ship] === undefined) {
         const location = randomizeLocation(fleet[ship]);
         if (isValidLocation(location)) locations[ship] = location;
       }
@@ -156,8 +143,9 @@ const Gameboard = () => {
 
   const isFleetDestroyed = () => Object.keys(fleet).length === sunkenShips;
 
+  assignRandomCoordinates();
+
   return {
-    assignRandomCoordinates,
     getLocations,
     isValidLocation,
     placeShip,
