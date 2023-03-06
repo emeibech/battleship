@@ -20,14 +20,14 @@ const Gameboard = () => {
     return firstVal < 11 && firstVal > 0 && secondVal < 11 && secondVal > 0;
   };
 
+  // This just returns a valid random coordinates
+  const getRandomCoordinates = () => {
+    const randomNum = () => Math.floor(Math.random() * 10) + 1;
+    return `${String.fromCharCode(randomNum() + 96)}${randomNum()}`;
+  };
+
   // Returns random location for the ships
   const randomizeLocation = ({ length }) => {
-    // This just returns a valid random coordinates
-    const getRandomCoordinates = () => {
-      const randomNum = () => Math.floor(Math.random() * 10) + 1;
-      return `${String.fromCharCode(randomNum() + 96)}${randomNum()}`;
-    };
-
     // Completes that coordinates based on the passed length
     const completeCoordinates = (coordinates) => {
       const orientation = Math.floor(Math.random() * 2);
@@ -146,6 +146,7 @@ const Gameboard = () => {
   assignRandomCoordinates();
 
   return {
+    getRandomCoordinates,
     getLocations,
     isValidLocation,
     placeShip,
