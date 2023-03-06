@@ -48,3 +48,11 @@ describe('isValidLocation checks for location overlaps', () => {
     expect(player.isValidLocation(testArgs)).toBe(true);
   });
 });
+
+describe('getRandomCoordinates returns a random coordinates', () => {
+  const player = Gameboard();
+  const firstCall = player.getRandomCoordinates();
+  test('Return different values each call', () => {
+    expect(player.getRandomCoordinates()).not.toEqual(firstCall);
+  });
+});
