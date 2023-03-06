@@ -40,11 +40,11 @@ describe('isValidLocation checks for location overlaps', () => {
     return coord;
   });
 
-  test('Return false if location given overlaps with existing location', () => {
+  test('Return false if given location overlaps with existing location', () => {
     expect(player.isValidLocation([locations[0]])).toBe(false);
   });
 
-  test('Return true if location given has no overlap', () => {
+  test('Return true if given location does not overlap', () => {
     expect(player.isValidLocation(testArgs)).toBe(true);
   });
 });
