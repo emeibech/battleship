@@ -10,6 +10,7 @@ const Gameboard = () => {
   };
 
   const locations = {};
+  const neighboringTiles = [];
   const missedShots = [];
   let sunkenShips = 0;
 
@@ -24,6 +25,39 @@ const Gameboard = () => {
   const getRandomCoordinates = () => {
     const randomNum = () => Math.floor(Math.random() * 10) + 1;
     return `${String.fromCharCode(randomNum() + 96)}${randomNum()}`;
+  };
+
+  const getAdjacentTiles = (coord) => {
+    const tempArr = [];
+    const incDecFirstVal = [0, +1, +1, +1, 0, -1, -1, -1];
+    const incDecSecondVal = [-1, -1, 0, +1, +1, +1, 0, -1];
+
+    while (incDecFirstVal.length > 0) {
+      const firstValNum = coord.charCodeAt() - 48;
+      const firstValStr = String.fromCharCode(
+        firstValNum + incDecFirstVal.shift() + 48,
+      );
+
+      const secondVal = Number(coord.slice(1, 3)) + incDecSecondVal.shift();
+      tempArr.push(firstValStr + secondVal);
+    }
+
+    return tempArr.filter((item) => isValidCoordinates(item));
+  };
+
+  const getNeighboringTiles = (location) => {
+    const tempArr = [];
+
+    location.forEach((coord) => {
+      tempArr.push(...getAdjacentTiles(coord));
+    });
+
+    const newArr = tempArr.filter((coord) => {
+      if (location.includes(coord)) return;
+      return coord;
+    });
+
+    return [...new Set(newArr)];
   };
 
   // Returns random location for the ships
@@ -86,7 +120,7 @@ const Gameboard = () => {
 
   // Checks for location overlaps
   const isValidLocation = (location) => {
-    const occupied = [].concat(...Object.values(locations));
+    const occupied = [...neighboringTiles].concat(...Object.values(locations));
 
     const matched = location.filter((item) => occupied.includes(item));
     return matched.length === 0;
@@ -96,7 +130,11 @@ const Gameboard = () => {
     Object.keys(fleet).forEach((ship) => {
       while (locations[ship] === undefined) {
         const location = randomizeLocation(fleet[ship]);
-        if (isValidLocation(location)) locations[ship] = location;
+
+        if (isValidLocation(location)) {
+          locations[ship] = location;
+          neighboringTiles.push(...getNeighboringTiles(location));
+        }
       }
     });
   };
