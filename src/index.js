@@ -1,4 +1,8 @@
 import './styles.css';
-import ui from './modules/ui';
+import playGame from './modules/playGame';
 
-document.addEventListener('DOMContentLoaded', ui);
+const startBtn = document.querySelector('[data-start]');
+
+document.addEventListener('DOMContentLoaded', () => {
+  playGame(startBtn);
+});
