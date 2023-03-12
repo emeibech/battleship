@@ -3,7 +3,10 @@ import Player from './Player';
 
 let player1 = Player();
 let dumbAI = Player(player1.enemy, player1.board);
+player1.board.assignRandomCoordinates();
+dumbAI.board.assignRandomCoordinates();
 let ui = userInterface(player1, dumbAI);
+let player1PrevLoc = player1.board.getLocations();
 const truthyOrFalsy = () => Math.floor(Math.random() * 2);
 const board1Selector = '[data-board1]';
 const board2Selector = '[data-board2]';
@@ -54,19 +57,20 @@ const play1 = (e) => {
   const hit = e.target.getAttribute('data-ship');
 
   if (
-    (attackHistory.includes(hit) || attackHistory.includes(miss))
+    (!miss && !hit)
+    || (attackHistory.includes(hit) || attackHistory.includes(miss))
   ) return;
-
-  if (miss) {
-    player1.attack(miss);
-    declareMiss(board2Selector, miss);
-    player1.recordAttack(miss);
-  }
 
   if (hit) {
     player1.attack(hit);
     declareHit(board2Selector, hit);
     player1.recordAttack(hit);
+  }
+
+  if (miss) {
+    player1.attack(miss);
+    declareMiss(board2Selector, miss);
+    player1.recordAttack(miss);
   }
 
   if (dumbAI.board.isFleetDestroyed()) {
@@ -76,6 +80,14 @@ const play1 = (e) => {
 
   ui.renderBoardOverlay();
   play2();
+};
+
+const restoreShips = () => {
+  Object.keys(player1PrevLoc).forEach((ship) => {
+    player1.board.placeShip(
+      { ship, location: player1PrevLoc[ship] },
+    );
+  });
 };
 
 const reset = (playGame) => {
@@ -88,6 +100,9 @@ const reset = (playGame) => {
       ui.resetBoards();
       player1 = Player();
       dumbAI = Player(player1.enemy, player1.board);
+      dumbAI.board.assignRandomCoordinates();
+      restoreShips();
+      player1PrevLoc = player1.board.getLocations();
       ui = userInterface(player1, dumbAI);
       ui.renderStartBtn();
       playGame(document.querySelector('[data-start]'));

@@ -49,16 +49,31 @@ const userInterface = (player1, player2) => {
       const box = document.querySelector(
         `${playerui.selector} [data-coordinates=${coord}]`,
       );
-      const overlay = document.createElement('div');
-      overlay.className = 'ship';
-      overlay.setAttribute('data-ship', `${coord}`);
-      box.appendChild(overlay);
+      box.className = 'ship';
+      box.removeAttribute('data-coordinates');
+      box.setAttribute('data-ship', `${coord}`);
     }
+  };
+
+  const revealShip = (coord) => {
+    const box = document.querySelector(
+      `[data-board2] [data-coordinates=${coord}]`,
+    );
+    box.className = 'ship';
+  };
+
+  const concealShips = () => {
+    const ships = document.querySelectorAll('[data-board2] [data-ship]');
+    Array.from(ships).forEach((box) => {
+      box.classList.toggle('ship');
+      box.classList.toggle('coordinates');
+    });
   };
 
   const renderShips = () => {
     createShipsOverlay(player1, player1ui);
     createShipsOverlay(player2, player2ui);
+    concealShips();
   };
 
   const removeElement = (element) => {
@@ -151,6 +166,7 @@ const userInterface = (player1, player2) => {
     resetBoards,
     renderGrid,
     renderShips,
+    revealShip,
   };
 };
 

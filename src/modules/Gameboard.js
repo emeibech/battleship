@@ -156,15 +156,8 @@ const Gameboard = () => {
     return ship;
   };
 
-  const removeCoordinates = (coordinates) => {
-    Object.keys(locations).forEach((ship) => {
-      locations[ship] = locations[ship].filter((item) => item !== coordinates);
-    });
-  };
-
   const recordAttack = ({ ship, coordinates }) => {
     if (ship !== null) {
-      removeCoordinates(coordinates);
       if (fleet[ship].isSunk()) sunkenShips += 1;
       hits[ship] = coordinates;
     } else {
@@ -204,8 +197,6 @@ const Gameboard = () => {
   const purgeMissedShots = () => {
     while (missedShots.length > 0) missedShots.pop();
   };
-
-  assignRandomCoordinates();
 
   return {
     getRandomCoordinates,
