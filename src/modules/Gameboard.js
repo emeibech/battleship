@@ -11,6 +11,7 @@ const Gameboard = () => {
 
   const locations = {};
   const neighboringTiles = [];
+  const hits = {};
   const missedShots = [];
   let sunkenShips = 0;
 
@@ -165,6 +166,7 @@ const Gameboard = () => {
     if (ship !== null) {
       removeCoordinates(coordinates);
       if (fleet[ship].isSunk()) sunkenShips += 1;
+      hits[ship] = coordinates;
     } else {
       missedShots.push(coordinates);
     }
@@ -181,6 +183,28 @@ const Gameboard = () => {
 
   const isFleetDestroyed = () => Object.keys(fleet).length === sunkenShips;
 
+  const restoreShips = () => {
+    Object.keys(locations).forEach((ship) => {
+      if (hits[ship]) locations[ship].push(...hits[ship]);
+    });
+  };
+
+  const purgeShips = () => {
+    Object.keys(locations).forEach((item) => {
+      hits[item] = [];
+    });
+  };
+
+  const purgeHits = () => {
+    Object.keys(hits).forEach((item) => {
+      hits[item] = [];
+    });
+  };
+
+  const purgeMissedShots = () => {
+    while (missedShots.length > 0) missedShots.pop();
+  };
+
   assignRandomCoordinates();
 
   return {
@@ -190,6 +214,11 @@ const Gameboard = () => {
     placeShip,
     receiveAttack,
     isFleetDestroyed,
+    restoreShips,
+    purgeShips,
+    purgeHits,
+    purgeMissedShots,
+    assignRandomCoordinates,
   };
 };
 
